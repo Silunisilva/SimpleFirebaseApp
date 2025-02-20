@@ -1,24 +1,33 @@
 import { useState, useEffect } from "react";
 import { Redirect } from "expo-router";
 import { View, Text, ActivityIndicator } from "react-native";
-import { getAuth } from "firebase/auth";
-import { getFirestore } from "firebase/firestore";
-import firebaseApp from "../../firebaseconfig"; // Ensure correct path to firebaseconfig
+import { getAuth, onAuthStateChanged } from "firebase/auth";
+import { firebaseApp }  from "../../firebaseconfig"; // Correct the import path
 
-// Initialize auth and db using the imported firebaseApp
+// Initialize auth using the imported firebaseApp
 const auth = getAuth(firebaseApp);
-const db = getFirestore(firebaseApp);
 
 export default function Index() {
   const [isLoading, setIsLoading] = useState(true);
+  const [isAuthenticated, setIsAuthenticated] = useState(null);
 
   useEffect(() => {
-    // Wait for 3 seconds before redirecting
-    const timer = setTimeout(() => {
-      setIsLoading(false);
-    }, 3000);
+    // Check if the user is authenticated
+    const unsubscribe = onAuthStateChanged(auth, (user) => {
+      if (user) {
+        setIsAuthenticated(true); // User is authenticated
+      } else {
+        setIsAuthenticated(false); // User is not authenticated
+      }
+      
+      // Simulate a delay of 3 seconds before hiding the loading spinner
+      setTimeout(() => {
+        setIsLoading(false); // Stop loading after the delay
+      }, 3000); // 3000 ms = 3 seconds
+    });
 
-    return () => clearTimeout(timer); // Cleanup function
+    // Cleanup function for unsubscribing
+    return () => unsubscribe();
   }, []);
 
   if (isLoading) {
@@ -30,5 +39,10 @@ export default function Index() {
     );
   }
 
-  return <Redirect href="/login" />;
+  // Redirect based on authentication state
+  if (isAuthenticated === null) {
+    return null; // Or handle the case where the auth state is still being determined
+  }
+
+  return <Redirect href={isAuthenticated ? "/(tabs)" : "/login"} />;
 }
