@@ -19,6 +19,10 @@ export default function LoginScreen() {
     }
   };
 
+  const handleRegisterRedirect = () => {
+    router.push('/register'); // Redirect to register page
+  };
+
   return (
     <View style={styles.container}>
       <Text style={styles.title}>Login</Text>
@@ -37,6 +41,13 @@ export default function LoginScreen() {
         onChangeText={setPassword}
       />
       <Button title="Login" onPress={handleLogin} />
+      
+      <Text style={styles.registerText}>
+        Don't have an account?{' '}
+        <Text style={styles.registerLink} onPress={handleRegisterRedirect}>
+          Register here
+        </Text>
+      </Text>
     </View>
   );
 }
@@ -63,5 +74,13 @@ const styles = StyleSheet.create({
   error: {
     color: 'red',
     marginBottom: 10,
+  },
+  registerText: {
+    marginTop: 20,
+    fontSize: 16,
+  },
+  registerLink: {
+    color: 'blue',
+    textDecorationLine: 'underline',
   },
 });

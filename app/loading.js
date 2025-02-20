@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { View, Text, ActivityIndicator, StyleSheet } from 'react-native';
 import { useRouter } from 'expo-router';
 import { getAuth, onAuthStateChanged } from 'firebase/auth';
@@ -6,14 +6,19 @@ import { getAuth, onAuthStateChanged } from 'firebase/auth';
 export default function LoadingScreen() {
   const router = useRouter();
   const auth = getAuth();
+  const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, (user) => {
-      if (user) {
-        router.replace('/(tabs)'); // Redirect to tabs if user is logged in
-      } else {
-        router.replace('/login'); // Redirect to login if user is not logged in
-      }
+      // Set timeout before redirecting, so it stays on the screen for a few seconds
+      setTimeout(() => {
+        if (user) {
+          router.replace('/(tabs)'); // Redirect to tabs if user is logged in
+        } else {
+          router.replace('/login'); // Redirect to login if user is not logged in
+        }
+      }, 2000); // 2 seconds delay
+
     });
 
     return () => unsubscribe(); // Cleanup listener
